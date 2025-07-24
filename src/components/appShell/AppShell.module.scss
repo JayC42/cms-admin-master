@@ -1,0 +1,36 @@
+.shell {
+  width: 100vw;
+  height: 100vh;
+
+  .drawerButton {
+    position: fixed;
+    left: 24px;
+    top: 16px;
+    z-index: 1300;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .drawer {
+    width: 325px;
+    flex-shrink: 0;
+
+    .MuiDrawer-paper {
+      width: 325px;
+      box-sizing: border-box;
+    }
+  }
+
+  .drawerContent {
+    width: 325px;
+  }
+
+  .mainContent {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    right: 0;
+  }
+}

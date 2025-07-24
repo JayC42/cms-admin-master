@@ -1,0 +1,83 @@
+name: Build and Deploy (Prod)
+on:
+  push:
+    branches:
+      - master
+
+env:
+  AWS_REGION: ap-east-1
+
+jobs:
+  # Build Job
+  build:
+    runs-on: ubuntu-latest
+    # runs-on: self-hosted
+    timeout-minutes: 3
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Project
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/master" ]; then
+            npm run build
+          fi
+
+      # TODO: Enable Tests when we implement E2E Testing
+      # - name: Run Tests
+      #   run: npm run test
+
+      - name: Run Formatter
+        run: npm run format
+
+      - name: Upload artifact to enable deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: vite-build-files
+          path: ./dist
+
+  deploy:
+    environment: ${{ github.ref == 'refs/heads/master' && 'production' ||
+      github.ref == 'refs/heads/development' && 'development' ||
+      github.ref == 'refs/heads/staging' && 'staging' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      # Download the build artifact
+      - name: Get build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vite-build-files
+
+      # Setup the AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{secrets.AWS_ACCOUNT_ID}}:role/pfunstore-admin-prod-githubaction-role
+          role-session-name: GitHubActions_PFunStore_Admin
+          aws-region: ap-east-1
+
+      # Copy the files from /build to S3 bucket based on the branch
+      - name: Deploy static site to S3 bucket
+        run: aws s3 sync . s3://admin.pfunstore.com --delete
+
+      # Invalidate index file in Cloudfront (this forces edges to fetch the latest index.html)
+      - name: Invalidate
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/index.html"

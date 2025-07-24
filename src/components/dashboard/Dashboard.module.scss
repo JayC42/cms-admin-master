@@ -1,0 +1,62 @@
+.dashboard {
+  width: auto;
+  height: 100vh;
+  top: 0;
+  right: 0;
+  padding: 1vw;
+  display: flex;
+  flex-direction: column;
+
+  .topRow {
+    width: 94vw;
+    height: 25vh;
+    display: flex;
+    flex-direction: row-reverse;
+    position: relative;
+    right: 0;
+  }
+
+  .topSlot {
+    width: 26vw;
+    height: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    margin: 1vw;
+    align-content: center;
+  }
+
+  .cardEffect {
+    border-radius: 1vw;
+    box-shadow: 0 3px 1vw 0.2vw rgba(0, 0, 0, 0.2);
+  }
+
+  .bottomRow {
+    width: 94vw;
+    height: 60vh;
+    display: flex;
+    margin-top: 3vh;
+    flex-direction: row-reverse;
+    position: relative;
+    right: 0;
+  }
+
+  .chartSlot {
+    width: 54vw;
+    height: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    margin: 1vw;
+    align-content: center;
+  }
+  .bottomRightTable {
+    width: 26vw;
+    height: 100%;
+    margin-top: 1vh;
+    margin-right: 2vw;
+  }
+
+  .tableSlot {
+    width: 100%;
+    height: 47%;
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    margin: 1vw;
+  }
+}

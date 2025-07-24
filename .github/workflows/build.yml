@@ -1,0 +1,33 @@
+name: Validate Code
+
+on:
+  pull_request:
+    branches:
+      - master
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      # TODO: Remove the force flag when we have sorted the React dependency issue
+      - name: Install dependencies
+        run: npm ci --force
+
+      # TODO: Enable Tests when we implement E2E Testing
+      # - name: Run Tests
+      #   run: npm test
+
+      - name: Build the application
+        run: npm run build
